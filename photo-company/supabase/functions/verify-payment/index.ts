@@ -81,13 +81,13 @@ serve(async (req: Request) => {
       );
     }
 
-    // Block fulfillment unless payment is confirmed
-    if (order.status !== 'paid') {
+    // Only allow verification for pending orders (payment made but not yet verified)
+    if (order.status !== 'pending') {
       return new Response(
         JSON.stringify({ 
           success: false,
           status: order.status,
-          error: "Payment not confirmed yet. Please complete payment first."
+          error: "Order is not in pending status for verification."
         }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

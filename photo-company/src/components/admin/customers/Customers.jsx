@@ -7,22 +7,86 @@ const Customers = () => {
   const { t } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadSessions();
+    
+    // Set up auto-refresh every 30 seconds to keep status in sync
+    const refreshInterval = setInterval(() => {
+      loadSessions(true);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(refreshInterval);
   }, []);
 
-  const loadSessions = async () => {
+  const loadSessions = async (isAutoRefresh = false) => {
     try {
-      const { data } = await supabase
+      if (isAutoRefresh) {
+        setRefreshing(true);
+      }
+      // Get all photo sessions
+      const { data: sessionsData } = await supabase
         .from('photo_sessions')
         .select('id, photos_count, payment_status')
         .order('created_at', { ascending: false });
-      setSessions(data || []);
+
+      if (!sessionsData) {
+        setSessions([]);
+        return;
+      }
+
+      // For each session, check the actual completion status from pending_orders
+      const sessionsWithStatus = await Promise.all(
+        sessionsData.map(async (session) => {
+          // Get all orders for this session
+          const { data: ordersData } = await supabase
+            .from('pending_orders')
+            .select('status, completed_at')
+            .eq('session_id', session.id);
+
+          if (!ordersData || ordersData.length === 0) {
+            // No orders found, use session payment_status
+            return { ...session, actual_payment_status: session.payment_status };
+          }
+
+          // Count orders by status
+          const completedOrders = ordersData.filter(order => order.status === 'completed');
+          const pendingOrders = ordersData.filter(order => order.status === 'pending');
+          const totalOrders = ordersData.length;
+          
+          // Determine the actual status based on pending_orders
+          let actualStatus;
+          if (completedOrders.length === totalOrders && totalOrders > 0) {
+            // All orders are completed
+            actualStatus = 'completed';
+          } else if (pendingOrders.length === totalOrders && totalOrders > 0) {
+            // All orders are pending
+            actualStatus = 'pending';
+          } else if (completedOrders.length > 0 && pendingOrders.length > 0) {
+            // Mixed status - some completed, some pending
+            actualStatus = 'partial';
+          } else {
+            // Fallback to session payment_status
+            actualStatus = session.payment_status;
+          }
+
+          return { 
+            ...session, 
+            actual_payment_status: actualStatus,
+            total_orders: totalOrders,
+            completed_orders: completedOrders.length,
+            pending_orders: pendingOrders.length
+          };
+        })
+      );
+
+      setSessions(sessionsWithStatus);
     } catch (error) {
       console.error('Error loading sessions:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -34,7 +98,17 @@ const Customers = () => {
 
   return (
     <div className="customers-section">
-      <h2>{t('customers')}</h2>
+      <div className="customers-header">
+        <h2>{t('customers')}</h2>
+        <button 
+          onClick={() => loadSessions(false)} 
+          className="refresh-btn"
+          title="Refresh customer status"
+          disabled={refreshing}
+        >
+          {refreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
+        </button>
+      </div>
       {sessions.length === 0 ? (
         <div className="no-customers">
           <p>{t('noCustomersFound')}</p>
@@ -59,11 +133,18 @@ const Customers = () => {
                 </div>
                 <div className="stat-item">
                   <div className="number">
-                    <span className={`status ${session.payment_status}`}>
-                      {session.payment_status === 'done' ? 'completed' : session.payment_status}
+                    <span className={`status ${session.actual_payment_status || session.payment_status}`}>
+                      {session.actual_payment_status || session.payment_status}
                     </span>
                   </div>
                   <div className="label">{t('paymentStatus')}</div>
+                  {session.total_orders > 0 && (
+                    <div className="order-details">
+                      <small>
+                        {session.completed_orders}/{session.total_orders} completed
+                      </small>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

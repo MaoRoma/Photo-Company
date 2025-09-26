@@ -28,14 +28,31 @@ const Dashboard = () => {
       setSessions(data || []);
       setError(null);
 
-      // Sales should come from immutable purchase records so deletions don't reduce totals
+      // Sales primarily come from immutable purchase records
       const { data: purchases, error: purchasesErr } = await supabase
         .from('photo_purchases')
-        .select('amount');
+        .select('amount, transaction_id');
+
+      let purchasesSum = 0;
+      let purchaseTransactionIds = new Set();
       if (!purchasesErr) {
-        const sum = (purchases || []).reduce((acc, p) => acc + (Number(p?.amount) || 0), 0);
-        setPurchasesTotal(sum);
+        purchasesSum = (purchases || []).reduce((acc, p) => acc + (Number(p?.amount) || 0), 0);
+        purchaseTransactionIds = new Set((purchases || []).map(p => String(p?.transaction_id || '')));
       }
+
+      // Fallback/backfill: include completed pending orders that don't yet have a purchase record
+      let completedPendingSum = 0;
+      const { data: completedOrders, error: completedErr } = await supabase
+        .from('pending_orders')
+        .select('order_id, amount, status')
+        .eq('status', 'completed');
+      if (!completedErr) {
+        completedPendingSum = (completedOrders || [])
+          .filter(o => !purchaseTransactionIds.has(String(o?.order_id || '')))
+          .reduce((acc, o) => acc + (Number(o?.amount) || 0), 0);
+      }
+
+      setPurchasesTotal(purchasesSum + completedPendingSum);
     } catch (error) {
       console.error('Error loading sessions:', error);
       setSessions([]);

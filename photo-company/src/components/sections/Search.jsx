@@ -255,16 +255,17 @@ const Search = () => {
     const checkIfAlreadyPurchased = async () => {
       try {
         if (!isPreviewModalOpen || !selectedPhoto || searchResults.length === 0) return;
-        const currentResult = searchResults.find(r => r.photoUrls && r.photoUrls.includes(selectedPhoto.url));
-        if (!currentResult || !currentResult.originalPhotoPaths) return;
+        // Use photo index rather than matching preview URL (which may change due to cache-busting)
+        const currentResult = searchResults[0];
+        if (!currentResult || !currentResult.originalPhotoPaths || typeof selectedPhoto.index !== 'number') return;
         const originalPhotoPath = currentResult.originalPhotoPaths[selectedPhoto.index];
 
-        // Look for the most recent order for this photo (completed, paid, or pending)
+        // Look for the most recent order for this photo (completed or pending)
         const { data, error } = await supabase
           .from('pending_orders')
           .select('order_id, customer_email, status, download_url, completed_at, created_at, photo_name')
           .eq('photo_path', originalPhotoPath)
-          .in('status', ['completed', 'paid', 'pending'])
+          .in('status', ['completed', 'pending'])
           .order('completed_at', { ascending: false, nullsFirst: false })
           .order('created_at', { ascending: false })
           .limit(1);
@@ -273,13 +274,9 @@ const Search = () => {
           const latest = data[0];
           if (latest.status === 'completed') {
             setCompletedOrder({ orderId: latest.order_id, customerEmail: latest.customer_email });
-          } else if (latest.status === 'paid') {
-            // Auto-verify to finalize and insert purchase record
-            setPendingOrder({ orderId: latest.order_id, customerEmail: latest.customer_email, photoName: latest.photo_name || selectedPhoto.name, photoIndex: selectedPhoto.index });
-            await verifyPayment();
           } else if (latest.status === 'pending') {
-            // Show Verify button so user can confirm payment and complete
-            setPendingOrder({ orderId: latest.order_id, customerEmail: latest.customer_email, photoName: latest.photo_name || selectedPhoto.name, photoIndex: selectedPhoto.index });
+            // Do not show Verify button for unpaid orders; keep Buy Now visible
+            setPendingOrder(null);
           }
         }
       } catch (e) {
@@ -294,9 +291,8 @@ const Search = () => {
     try {
       setIsCreatingOrder(true);
       // Find the current search result to get original photo path
-      const currentResult = searchResults.find(result => 
-        result.photoUrls && result.photoUrls.includes(photoUrl)
-      );
+      // Use the first (and only) search result and the provided index to locate the original photo
+      const currentResult = searchResults[0];
       
       if (!currentResult || !currentResult.originalPhotoPaths) {
         alert('Error: Unable to find original photo for download');
@@ -354,15 +350,15 @@ const Search = () => {
         }
       }
 
-      // Store order info for verification
-      setPendingOrder({ orderId, customerEmail, photoName, photoIndex });
+      // Store order info for verification (mark as client-side pending)
+      setPendingOrder({ orderId, customerEmail, photoName, photoIndex, status: 'pending' });
 
       // Redirect to Square payment with order_id parameter
       const squareUrl = `https://square.link/u/eF0FryOx?src=embed&order_id=${encodeURIComponent(orderId)}`;
       console.log('Redirecting to Square payment URL:', squareUrl);
       
       // Store order info in localStorage for when user returns
-      localStorage.setItem('pendingOrder', JSON.stringify({ orderId, customerEmail, photoName, photoIndex }));
+      localStorage.setItem('pendingOrder', JSON.stringify({ orderId, customerEmail, photoName, photoIndex, status: 'pending' }));
       
       // Redirect to Square payment
       window.location.href = squareUrl;
@@ -385,14 +381,6 @@ const Search = () => {
 
     setIsVerifyingPayment(true);
     try {
-      // If we are in the active purchase flow, mark as paid (fallback without webhooks)
-      if (pendingOrder) {
-        await supabase
-          .from('pending_orders')
-          .update({ status: 'paid' })
-          .eq('order_id', pendingOrder.orderId);
-      }
-
       const response = await fetch(`${supabase.supabaseUrl}/functions/v1/verify-payment`, {
         method: 'POST',
         headers: {
@@ -408,10 +396,13 @@ const Search = () => {
       const result = await response.json();
 
       if (result.success && result.status === 'completed') {
+        // Capture values before clearing state to avoid null reference errors
+        const baseName = pendingOrder?.photoName || selectedPhoto?.name || 'photo';
+        const displayIndex = (pendingOrder?.photoIndex ?? selectedPhoto?.index ?? 0) + 1;
+        
         // Download the photo
         const link = document.createElement('a');
         link.href = result.downloadUrl;
-        const baseName = pendingOrder?.photoName || selectedPhoto?.name || 'photo';
         link.download = `${String(baseName).replace(/\s+/g, '-').toLowerCase()}.jpg`;
         document.body.appendChild(link);
         link.click();
@@ -422,9 +413,10 @@ const Search = () => {
         setPendingOrder(null);
         setCompletedOrder(null);
         
-        alert(`Payment verified! Photo ${pendingOrder.photoIndex + 1} is downloading.`);
+        // Use captured values for alert message
+        alert(`Payment verified! Photo ${displayIndex} is downloading.`);
       } else {
-        alert('Payment not yet verified. Please complete payment and try again.');
+        alert('Payment not yet verified. Please complete payment on Square and try again.');
       }
     } catch (error) {
       console.error('Verification error:', error);
@@ -568,7 +560,33 @@ const Search = () => {
                       <li>✓ Instant download</li>
                     </ul>
 
-                    {!pendingOrder ? (
+                    {completedOrder ? (
+                      <div style={{ textAlign: 'center' }}>
+                        <p style={{ marginBottom: '10px', color: '#666' }}>
+                          Purchase confirmed: {completedOrder.orderId}
+                        </p>
+                        <button 
+                          className="package-btn digital-btn" 
+                          onClick={verifyPayment}
+                          disabled={isVerifyingPayment}
+                          style={{
+                            display: 'inline-block',
+                            fontSize: '16px',
+                            lineHeight: '40px',
+                            height: '40px',
+                            color: '#ffffff',
+                            minWidth: '200px',
+                            backgroundColor: isVerifyingPayment ? '#ccc' : '#28a745',
+                            textAlign: 'center',
+                            borderRadius: '6px',
+                            border: 'none',
+                            cursor: isVerifyingPayment ? 'not-allowed' : 'pointer'
+                          }}
+                        >
+                          {isVerifyingPayment ? 'Preparing...' : 'Download'}
+                        </button>
+                      </div>
+                    ) : !pendingOrder ? (
                       <div style={{
                         overflow: 'auto',
                         display: 'flex',
