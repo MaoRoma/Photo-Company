@@ -10,6 +10,65 @@
   color: #2c3e50;
 }
 
+/* Service Information Styles */
+.service-info {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  border-left: 4px solid #e74c3c;
+}
+
+.service-description {
+  margin-bottom: 2rem;
+}
+
+.service-description p {
+  color: #555;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.service-details {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.detail-item {
+  margin-bottom: 0.8rem;
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.detail-item strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.photo-info {
+  background: #e8f4f8;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+}
+
+.photo-info p {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.photo-info p:last-child {
+  margin-bottom: 0;
+  font-style: italic;
+  color: #666;
+}
+
 .contact-content {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -84,6 +143,23 @@
   .contact h2 {
     font-size: 2rem;
     margin-bottom: 2rem;
+  }
+
+  .service-info {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .service-description p {
+    font-size: 1rem;
+  }
+
+  .service-details {
+    padding: 1rem;
+  }
+
+  .photo-info {
+    padding: 1rem;
   }
 
   .contact-content {

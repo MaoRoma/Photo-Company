@@ -32,27 +32,55 @@ const Contact = () => {
     <section id="contact" className="contact">
       <div className="container">
         <h2>{t('contactUs')}</h2>
+        
+        {/* Service Information */}
+        <div className="service-info">
+          <div className="service-description">
+            <p>Feel free to take photos with a small group of people, such as family, friends, or solo travelers.</p>
+            <p>After taking the photo, you can hand over the photo in 2 or 3 minutes.</p>
+            <p>The shooting location is mainly the background of the golden hall, but depending on the season, we can also accommodate the customer's wishes, such as cherry blossoms and maples.</p>
+          </div>
+          
+          <div className="service-details">
+            <div className="detail-item">
+              <strong>・Shooting location:</strong> Chusonji precincts (near Kindo)
+            </div>
+            <div className="detail-item">
+              <strong>・Reception location:</strong> Kindo-mae square shooting site
+            </div>
+            <div className="detail-item">
+              <strong>・Fee:</strong> 1,800 yen (1 photo)
+            </div>
+            <div className="detail-item">
+              <strong>・Size:</strong> Hachikiri (204mm×152mm)
+            </div>
+          </div>
+          
+        </div>
+
         <div className="contact-content">
           <div className="contact-info">
             <div className="contact-item">
               <FontAwesomeIcon icon={faMapMarkerAlt} />
               <div>
-                <h3>{t('address')}</h3>
-                <p>{t('addressDetails')}</p>
+                <h3>Reception Location</h3>
+                <p>Kindo-mae square shooting site</p>
               </div>
             </div>
             <div className="contact-item">
               <FontAwesomeIcon icon={faPhone} />
               <div>
-                <h3>{t('phone')}</h3>
-                <p>{t('phoneNumber')}</p>
+                <h3>Phone & Fax</h3>
+                <p>TEL: 0191-46-3554</p>
+                <p>FAX: 0191-46-3554</p>
+                <p><small>(Reception hours 8:30~17:30)</small></p>
               </div>
             </div>
             <div className="contact-item">
               <FontAwesomeIcon icon={faEnvelope} />
               <div>
                 <h3>{t('email')}</h3>
-                <p>{t('emailAddress')}</p>
+                <p>hiraizumi-photo@spice.ocn.ne.jp</p>
               </div>
             </div>
           </div>
