@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Storage Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Supabase Storage Test</h1>
+    <div id="status">Testing...</div>
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="testUpload()">Test Upload</button>
+    <div id="result"></div>
+
+    <script>
+        // Replace with your actual Supabase credentials
+        const supabaseUrl = 'YOUR_SUPABASE_URL';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function testUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Uploading...';
+
+            try {
+                // Test upload
+                const fileName = `test-${Date.now()}-${file.name}`;
+                const { data, error } = await supabase.storage
+                    .from('photos')
+                    .upload(fileName, file);
+
+                if (error) {
+                    resultDiv.innerHTML = `❌ Upload failed: ${error.message}`;
+                    console.error('Upload error:', error);
+                } else {
+                    resultDiv.innerHTML = `✅ Upload successful: ${data.path}`;
+                    console.log('Upload success:', data);
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `❌ Error: ${err.message}`;
+                console.error('Error:', err);
+            }
+        }
+
+        // Test bucket access on page load
+        async function testBucketAccess() {
+            try {
+                const { data, error } = await supabase.storage
+                    .from('photos')
+                    .list('', { limit: 1 });
+
+                if (error) {
+                    document.getElementById('status').innerHTML = `❌ Bucket access failed: ${error.message}`;
+                } else {
+                    document.getElementById('status').innerHTML = `✅ Bucket access successful. Found ${data.length} items.`;
+                }
+            } catch (err) {
+                document.getElementById('status').innerHTML = `❌ Error: ${err.message}`;
+            }
+        }
+
+        // Run test on page load
+        testBucketAccess();
+    </script>
+</body>
+</html>

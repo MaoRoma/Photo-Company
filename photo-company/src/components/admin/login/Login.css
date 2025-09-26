@@ -1,0 +1,128 @@
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  padding: 2rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.login-card h1 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.8rem;
+}
+
+.login-sub {
+  margin: 0 0 1.25rem 0;
+  color: #7f8c8d;
+}
+
+.login-error {
+  background: #fdecea;
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.login-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.login-form label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.35rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  background: #fff;
+  color: #2c3e50; /* ensure text is visible */
+}
+
+.toggle-visibility {
+  position: absolute;
+  right: 10px;
+  top: 34px;
+  height: 36px;
+  width: 36px;
+  border: none;
+  background: transparent;
+  color: #7f8c8d;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.toggle-visibility:hover {
+  background: #f3f5f7;
+  color: #2c3e50;
+}
+
+/* Make room so text doesn't sit underneath the icon */
+.input-wrapper input {
+  padding-right: 2.5rem;
+}
+
+.toggle-visibility svg {
+  font-size: 1rem;
+}
+
+.login-form input:focus {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+}
+
+.login-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  border: none;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(231, 76, 60, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(231, 76, 60, 0.3);
+}
+
+.login-hint {
+  display: block;
+  margin-top: 0.75rem;
+  color: #95a5a6;
+}
+
+

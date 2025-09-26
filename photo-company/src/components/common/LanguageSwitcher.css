@@ -1,0 +1,58 @@
+.language-switcher {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.language-switcher:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.language-switcher:active {
+  transform: translateY(0);
+}
+
+/* Variant for navbar */
+.language-switcher.navbar {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+
+/* Variant for admin header */
+.language-switcher.admin {
+  background: #2c3e50;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  margin-left: 1rem;
+}
+
+.language-switcher.admin:hover {
+  background: #34495e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .language-switcher {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .language-switcher.navbar {
+    margin-left: 0.5rem;
+  }
+  
+  .language-switcher.admin {
+    margin-left: 0.5rem;
+  }
+}
