@@ -39,10 +39,10 @@ function App() {
           <>
             <Navbar />
             <main>
+              <Search />
               <Hero />
               <Services />
               <Gallery />
-              <Search />
               <About />
               <Contact />
             </main>

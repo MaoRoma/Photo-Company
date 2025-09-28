@@ -433,7 +433,7 @@ const Search = () => {
   };
 
   return (
-    <section id="search" className="search-section">
+    <section id="search" className="search-section home-section">
       <div className="container">
         <h2>{t('findYourPhotos')}</h2>
         <p>{t('searchSubtitle')}</p>

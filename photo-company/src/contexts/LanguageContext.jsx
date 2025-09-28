@@ -86,7 +86,6 @@ export const LanguageProvider = ({ children }) => {
         actions: 'Actions',
         active: 'ACTIVE',
         completed: 'COMPLETED',
-        delete: 'Delete',
         noSessionsFound: 'No sessions found.',
         noCustomersFound: 'No customers found.',
         
@@ -203,7 +202,6 @@ export const LanguageProvider = ({ children }) => {
         actions: 'アクション',
         active: 'アクティブ',
         completed: '完了',
-        delete: '削除',
         noSessionsFound: 'セッションが見つかりません。',
         noCustomersFound: '顧客が見つかりません。',
         
