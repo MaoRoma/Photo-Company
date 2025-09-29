@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { supabase } from '../../../lib/supabase';
 import './Sessions.css';
@@ -28,26 +28,6 @@ const Sessions = () => {
     }
   };
 
-  const updateSession = async (sessionId, updates) => {
-    try {
-      const { error } = await supabase
-        .from('photo_sessions')
-        .update(updates)
-        .eq('id', sessionId);
-      
-      if (error) {
-        console.error('Error updating session:', error);
-        return false;
-      }
-      
-      // Reload sessions to get updated data
-      loadSessions();
-      return true;
-    } catch (error) {
-      console.error('Error updating session:', error);
-      return false;
-    }
-  };
 
   const deleteSession = async (sessionId) => {
     if (window.confirm('Are you sure you want to delete this session and all its photos? This action cannot be undone.')) {
@@ -150,15 +130,6 @@ const Sessions = () => {
                     </span>
                   </td>
                   <td>
-                    <button
-                      className="btn-icon"
-                      onClick={() => updateSession(session.id, {
-                        status: session.status === 'active' ? 'completed' : 'active'
-                      })}
-                      title="Toggle Status"
-                    >
-                      <FontAwesomeIcon icon={session.status === 'active' ? faCheck : faTimes} />
-                    </button>
                     <button
                       className="btn-icon"
                       onClick={() => deleteSession(session.id)}

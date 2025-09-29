@@ -1,16 +1,14 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faTimes, faChevronLeft, faChevronRight, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faTimes, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './Gallery.css';
 
 const Gallery = () => {
   const { t } = useLanguage();
-  const [selectedCategory, setSelectedCategory] = useState('all');
   const [lightboxImage, setLightboxImage] = useState(null);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [favorites, setFavorites] = useState(new Set());
 
   const galleryImages = [
     {
@@ -35,14 +33,14 @@ const Gallery = () => {
       description: 'Traditional kimono photography'
     },
     {
-      src: 'http://hiraizumiphoto.com/img/chusonji-kojin_360_02.png',
+      src: 'https://i0.wp.com/blog.jtbusa.com/wp-content/uploads/2016/01/2015-Oct-Japan-Hiraizumi-Chusonji-127-1024x682.jpg?resize=640%2C426&is-pending-load=1',
       alt: 'Temple Photography',
       category: 'cultural',
       title: 'Chusonji Temple',
       description: 'Sacred temple photography'
     },
     {
-      src: 'http://hiraizumiphoto.com/img/chusonji-kojin_360_04.jpg',
+      src: 'https://kyoto-kanko.net/wp-content/uploads/2013/06/chionin_14-min.jpg',
       alt: 'Heritage Site',
       category: 'cultural',
       title: 'Heritage Photography',
@@ -57,16 +55,6 @@ const Gallery = () => {
     }
   ];
 
-  const categories = [
-    { id: 'all', name: 'All Photos' },
-    { id: 'portrait', name: 'Portraits' },
-    { id: 'cultural', name: 'Cultural' },
-    { id: 'professional', name: 'Professional' }
-  ];
-
-  const filteredImages = selectedCategory === 'all' 
-    ? galleryImages 
-    : galleryImages.filter(image => image.category === selectedCategory);
 
   useEffect(() => {
     // Simulate loading
@@ -88,22 +76,13 @@ const Gallery = () => {
 
   const navigateLightbox = (direction) => {
     const newIndex = direction === 'next' 
-      ? (lightboxIndex + 1) % filteredImages.length
-      : lightboxIndex === 0 ? filteredImages.length - 1 : lightboxIndex - 1;
+      ? (lightboxIndex + 1) % galleryImages.length
+      : lightboxIndex === 0 ? galleryImages.length - 1 : lightboxIndex - 1;
     
     setLightboxIndex(newIndex);
-    setLightboxImage(filteredImages[newIndex]);
+    setLightboxImage(galleryImages[newIndex]);
   };
 
-  const toggleFavorite = (index) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(index)) {
-      newFavorites.delete(index);
-    } else {
-      newFavorites.add(index);
-    }
-    setFavorites(newFavorites);
-  };
 
   const handleFindPhoto = (image) => {
     // Scroll to search section
@@ -144,25 +123,11 @@ const Gallery = () => {
         <h2>{t('photoGallery')}</h2>
         <p className="gallery-subtitle">{t('gallerySubtitle')}</p>
         
-        {/* Category Filters */}
-        <div className="gallery-filters">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`filter-btn ${selectedCategory === category.id ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(category.id)}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-
         {/* Gallery Grid */}
-        {filteredImages.length > 0 ? (
-          <div className="gallery-grid">
-            {filteredImages.map((image, index) => (
+        <div className="gallery-grid">
+          {galleryImages.map((image, index) => (
               <div 
-                key={`${selectedCategory}-${index}`} 
+                key={index} 
                 className="gallery-item"
                 onClick={() => handleImageClick(image, index)}
               >
@@ -186,19 +151,7 @@ const Gallery = () => {
                 </div>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="gallery-empty">
-            <h3>No photos found</h3>
-            <p>No photos match the selected category.</p>
-            <button 
-              className="btn"
-              onClick={() => setSelectedCategory('all')}
-            >
-              Show All Photos
-            </button>
-          </div>
-        )}
+        </div>
 
         {/* Lightbox Modal */}
         {lightboxImage && (
@@ -218,7 +171,7 @@ const Gallery = () => {
                 className="lightbox-image"
               />
               
-              {filteredImages.length > 1 && (
+              {galleryImages.length > 1 && (
                 <>
                   <button 
                     className="lightbox-nav lightbox-prev"
