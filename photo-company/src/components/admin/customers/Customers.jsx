@@ -28,7 +28,7 @@ const Customers = () => {
       // Get all photo sessions
       const { data: sessionsData } = await supabase
         .from('photo_sessions')
-        .select('id, photos_count, payment_status')
+        .select('id, photos_count, payment_status, expires_at')
         .order('created_at', { ascending: false });
 
       if (!sessionsData) {
@@ -74,6 +74,13 @@ const Customers = () => {
           return { 
             ...session, 
             actual_payment_status: actualStatus,
+            expired: (() => {
+              try {
+                return !!session.expires_at && new Date(session.expires_at).getTime() <= Date.now();
+              } catch {
+                return false;
+              }
+            })(),
             total_orders: totalOrders,
             completed_orders: completedOrders.length,
             pending_orders: pendingOrders.length
@@ -143,6 +150,17 @@ const Customers = () => {
                       <small>
                         {session.completed_orders}/{session.total_orders} completed
                       </small>
+                    </div>
+                  )}
+                </div>
+                <div className="stat-item">
+                  <div className="number">
+                    {session.expires_at ? new Date(session.expires_at).toLocaleDateString() : '—'}
+                  </div>
+                  <div className="label">Expiry</div>
+                  {session.expired && (
+                    <div className="order-details">
+                      <small style={{ color: '#e74c3c', fontWeight: 'bold' }}>Expired</small>
                     </div>
                   )}
                 </div>

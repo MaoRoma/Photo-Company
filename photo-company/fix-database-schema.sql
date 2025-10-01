@@ -10,6 +10,7 @@ CREATE TABLE public.photo_sessions (
   photo_paths jsonb NOT NULL DEFAULT '[]'::jsonb, -- Changed to JSONB for better performance
   status text NOT NULL DEFAULT 'active',
   payment_status text NOT NULL DEFAULT 'pending',
+  expires_at timestamptz NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   admin_email text NOT NULL
 );

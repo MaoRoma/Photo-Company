@@ -13,6 +13,7 @@ const Upload = () => {
   const [photos, setPhotos] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [sessionIdError, setSessionIdError] = useState('');
+  const [expiryDays, setExpiryDays] = useState('never');
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files).filter(file => file.type.startsWith('image/'));
@@ -175,6 +176,16 @@ const Upload = () => {
           photo_paths: uploadedPaths, // Send as array for JSONB column
           status: 'active',
           payment_status: 'pending',
+          expires_at: (() => {
+            try {
+              if (!expiryDays || expiryDays === 'never') return null;
+              const days = Number(expiryDays);
+              if (!Number.isFinite(days) || days <= 0) return null;
+              return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+            } catch (_) {
+              return null;
+            }
+          })(),
           admin_email: ADMIN_EMAIL || 'admin@example.com'
         });
       
@@ -247,6 +258,39 @@ const Upload = () => {
                 {sessionIdError}
               </div>
             )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="expiresAt">{t('expiresAt') || 'Expiry'}</label>
+            <select
+              id="expiresAt"
+              value={expiryDays}
+              onChange={(e) => setExpiryDays(e.target.value)}
+              style={{
+                padding: '0.6rem 0.9rem',
+                fontSize: '1rem',
+                lineHeight: '1.4',
+                height: '42px',
+                borderRadius: '8px',
+                border: '1px solid #d1d5db',
+                backgroundColor: '#ffffff',
+                color: '#111827'
+              }}
+            >
+              <option value="never">Never</option>
+              <option value="10">10 days</option>
+              <option value="20">20 days</option>
+              <option value="30">30 days</option>
+              <option value="40">40 days</option>
+              <option value="50">50 days</option>
+              <option value="60">60 days</option>
+              <option value="70">70 days</option>
+              <option value="80">80 days</option>
+              <option value="90">90 days</option>
+            </select>
+            <small style={{ display: 'block', marginTop: '4px', color: '#666' }}>
+              {t('expiresAtHelp') || 'Controls when this session hides from the website (storage is retained).'}
+            </small>
           </div>
           
           {/* Customer Name field removed to allow upload without name */}

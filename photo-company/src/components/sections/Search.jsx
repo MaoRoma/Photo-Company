@@ -174,7 +174,7 @@ const Search = () => {
       // Search for session in database
       const { data, error } = await supabase
         .from('photo_sessions')
-        .select('id, photos_count, photo_paths, status, created_at')
+        .select('id, photos_count, photo_paths, status, created_at, expires_at')
         .eq('id', searchTerm.trim())
         .single();
 
@@ -189,6 +189,16 @@ const Search = () => {
       }
 
       if (data) {
+        // Hide expired sessions for customers
+        try {
+          if (data.expires_at && new Date(data.expires_at).getTime() <= Date.now()) {
+            setSearchResults([]);
+            alert('This session has expired. Please contact support to recover your photos.');
+            return;
+          }
+        } catch (_) {
+          // ignore parse issues
+        }
         // photo_paths should be an array (JSONB format)
         const photoPaths = Array.isArray(data.photo_paths) 
           ? data.photo_paths 

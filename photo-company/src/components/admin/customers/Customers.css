@@ -39,15 +39,25 @@
 
 .customers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
 .customer-card {
   background: white;
-  padding: 2rem;
-  border-radius: 15px;
+  padding: 1.5rem;
+  border-radius: 16px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.customer-card:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 .customer-header {
@@ -58,8 +68,8 @@
 }
 
 .customer-avatar {
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   background: linear-gradient(135deg, #e74c3c, #c0392b);
   border-radius: 50%;
   display: flex;
@@ -67,12 +77,14 @@
   justify-content: center;
   color: white;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.35);
 }
 
 .customer-info h3 {
   margin: 0;
   color: #2c3e50;
+  letter-spacing: 0.2px;
 }
 
 .customer-info p {
@@ -82,13 +94,37 @@
 }
 
 .customer-stats {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .stat-item {
   flex: 1;
+  background: #f8fafc;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 92px;
+}
+
+.stat-item .number {
+  font-size: 1.6rem;
+}
+
+.customer-stats .stat-item:last-child .number {
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.customer-stats .stat-item:last-child {
+  background: #f3f4f6;
 }
 
 .stat-item .number {
@@ -150,6 +186,11 @@
   background: linear-gradient(135deg, #ff9800, #f57c00);
   color: #fff;
   border-color: #f57c00;
+}
+
+/* Expired helper styles */
+.order-details small[style] {
+  letter-spacing: 0.2px;
 }
 
 .customer-payment .btn {

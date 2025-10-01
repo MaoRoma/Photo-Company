@@ -20,6 +20,7 @@ CREATE TABLE public.photo_sessions (
   photo_paths jsonb NOT NULL DEFAULT '[]'::jsonb, -- JSONB for better performance
   status text NOT NULL DEFAULT 'active',
   payment_status text NOT NULL DEFAULT 'pending',
+  expires_at timestamptz NULL,
   created_at timestamptz NOT NULL DEFAULT now(),
   admin_email text NOT NULL
 );
@@ -56,6 +57,7 @@ FOR UPDATE TO anon USING (true);
 - ✅ Photos should appear in `photos` bucket
 - ✅ Watermarked versions should be created in `photos-watermarked` bucket
 - ✅ Customer search should show watermarked photos
+- ✅ Admin can set optional expiry; customer site hides expired sessions while data remains in storage
 
 ## 🚀 **Next Steps**
 
