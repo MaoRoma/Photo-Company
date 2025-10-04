@@ -18,7 +18,7 @@ const Sessions = () => {
     try {
       const { data, error } = await supabase
         .from('photo_sessions')
-        .select('id, photos_count, status, payment_status, created_at')
+        .select('id, photos_count, payment_status, created_at')
         .order('created_at', { ascending: false });
       if (!error) setSessions(data || []);
     } catch (error) {
@@ -114,7 +114,6 @@ const Sessions = () => {
                 <th>{t('id')}</th>
                 <th>{t('date')}</th>
                 <th>{t('photos')}</th>
-                <th>{t('status')}</th>
                 <th>{t('actions')}</th>
               </tr>
             </thead>
@@ -124,11 +123,6 @@ const Sessions = () => {
                   <td>{session.id}</td>
                   <td>{new Date(session.created_at).toLocaleDateString()}</td>
                   <td>{session.photos_count}</td>
-                  <td>
-                    <span className={`status ${session.status.toLowerCase()}`}>
-                      {session.status}
-                    </span>
-                  </td>
                   <td>
                     <button
                       className="btn-icon"
